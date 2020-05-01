@@ -32,7 +32,7 @@ class SpadSec:
 ╚════██║██╔═══╝ ██╔══██║██║  ██║╚════██║██╔══╝  ██║     
 ███████║██║     ██║  ██║██████╔╝███████║███████╗╚██████╗
 ╚══════╝╚═╝     ╚═╝  ╚═╝╚═════╝ ╚══════╝╚══════╝ ╚═════╝
-            Telegram Username Stealer v1.0
+            Telegram Username Stealer v2.0
                   github.com/L0C4L
                     t.me/SpadSEC
 
@@ -52,20 +52,20 @@ class SpadSec:
 
 class Stealer:
     def CreateChannel(self, username):
-        client.start()
         channel = client.create_channel("SpadStealer", "SpadUsernameStealer")
         client.update_chat_username(channel.id, username)
         client.stop()
-        global is_steal
-        is_steal = True
-
 
 def checker(user):
-    _conn = get(f"https://t.me/{user}", timeout=5)
-    if "</a> right away." in _conn.text:
-        print("Stealed")
-        steal = Stealer()
-        steal.CreateChannel(user)
+    while True:
+        _conn = get(f"https://t.me/{user}", timeout=5)
+        if "</a> right away." in _conn.text:
+            print("Stealed")
+            client.start()
+            sleep(2)
+            steal = Stealer()
+            steal.CreateChannel(user)
+            break
 
 if __name__ == "__main__":
     try:
@@ -74,12 +74,17 @@ if __name__ == "__main__":
         logo.logo_printer()
         try:
             username = sys.argv[1]
+            try:
+                with open(username, mode="r", encoding="UTF-8") as usernames:
+                    usernames = usernames.read().splitlines()
+            except FileNotFoundError:
+                print(f"{Fore.YELLOW}File not Found{Style.RESET_ALL}")
+                sys.exit(True)
         except IndexError:
-            print(f"{Fore.YELLOW}Usage: {Fore.GREEN}python {Fore.CYAN}{sys.argv[0]} {Fore.GREEN}username{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Usage: {Fore.GREEN}python {Fore.CYAN}{sys.argv[0]} {Fore.GREEN}usernames.txt{Style.RESET_ALL}")
             sys.exit(True)
-
-        while not is_steal:
-            Thread(target=checker, args=(username,)).start()
+        for data in usernames:
+            Thread(target=checker, args=(data,)).start()
             sleep(1)
     except KeyboardInterrupt:
         print("\nGoodBye <3")
